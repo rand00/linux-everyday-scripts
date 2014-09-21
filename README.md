@@ -55,4 +55,14 @@ within the other terminal window.
 #### Dependencies
 
 * xsel http://www.vergenet.net/~conrad/software/xsel/
-* GNU Bourne-Again SHell (bash)
+* bash _(std. utility on GNU/Linux)_
+
+## Cpugrep
+
+Watch a live-updating view of the each cpu-cores frequency.
+
+#### Dependencies
+
+* watch _(std. utility on GNU/Linux)_
+* grep _(std. utility on GNU/Linux)_
+* bash _(std. utility on GNU/Linux)_
