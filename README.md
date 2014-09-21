@@ -21,7 +21,7 @@ and passes them on to Okular as if you had supplied the pdf's specifically.
 
 * Quickly open pdf-files when working in a terminal environment.
 * From within Emacs use `M-x !` to call `pok` with some pdf from the current working directory.
-* Make a directory for **active pdf's** with sym-links to the pdf's you're currently reading
+* Make a directory for *active pdf's* with symbolic links to the pdf's you're currently reading
 and supply the directory as argument to `pok` for quick-opening. 
 
 #### Dependencies
