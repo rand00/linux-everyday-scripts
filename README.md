@@ -15,7 +15,6 @@ several pdf's; this version of pok is not compatible with those._
 
 * When given directories as part of the arguments, pok searches non-recursively for pdf-files
 and passes them on to Okular as if you had supplied the pdf's specifically.
-
 * The output of Okular is suppressed, so you can continue working in your current terminal.
 
 #### Use-cases
@@ -25,5 +24,11 @@ and passes them on to Okular as if you had supplied the pdf's specifically.
 * Make a directory for **active pdf's** with sym-links to the pdf's you're currently reading
 and supply the directory as argument to `pok` for quick-opening. 
 
-#### Links
-Okular https://okular.kde.org/
+#### Dependencies
+
+* Okular https://okular.kde.org/
+* Batteries included https://github.com/ocaml-batteries-team/batteries-included
+* OCaml Pcre https://github.com/mmottl/pcre-ocaml/
+* OCaml Text https://github.com/vbmithr/ocaml-text
+
+_OCaml packages can be found on opam._
