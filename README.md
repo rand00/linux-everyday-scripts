@@ -27,6 +27,8 @@ and supply the directory as argument to `pok` for quick-opening.
 #### Dependencies
 
 * Okular https://okular.kde.org/
+* OCaml http://ocaml.org/
+* _(Optional)_ Opam https://opam.ocaml.org/
 * Batteries included https://github.com/ocaml-batteries-team/batteries-included
 * OCaml Pcre https://github.com/mmottl/pcre-ocaml/
 * OCaml Text https://github.com/vbmithr/ocaml-text
@@ -53,3 +55,4 @@ within the other terminal window.
 #### Dependencies
 
 * xsel http://www.vergenet.net/~conrad/software/xsel/
+* GNU Bourne-Again SHell (bash)
