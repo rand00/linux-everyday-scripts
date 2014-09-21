@@ -5,7 +5,7 @@ Scripts for everyday use.
 
 ### Pok 
 
-Handles opening of pdf-files or directories given as cmd-line arguments in the 
+Handles opening of pdf-files or directories of pdf-files given as cmd-line arguments in the 
 Okular pdf-viewer.
 
 _Working with Okular v. 0.19.3 - earlier versions of Okular needed multiple calls to open
