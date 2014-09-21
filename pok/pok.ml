@@ -41,6 +41,14 @@ let find_pdfs dir =
       | true  -> Some (dir ^ file)
       | false -> None)
   |> List.of_enum
+  |> function
+      | [] -> 
+        let _ = print_endline 
+          (String.concat "" 
+             [ "No pdf's where present in the supplied directory, '";
+               dir; "'." ]) 
+        in [] 
+      | l -> l
 
 let pok () = 
   match peek (args ()) with 
@@ -50,13 +58,16 @@ let pok () =
          [ "Pok usage // Supply a mixed list of pdf-files or directories ";
            "containing pdf-files as arguments. Pok will open them all in ";
            "the Okular pdf-viewer." ])
-  | _ -> 
+  | Some _ -> 
     open_pdfs
       (List.( flatten ( map (fun arg -> 
         match is_existingdir arg with
           | false -> [ arg ]
           | true  -> find_pdfs arg
        ) (args () |> List.of_enum ))))
+  | None -> 
+    open_pdfs (find_pdfs (Sys.getcwd ()))
+    
 
 
 let () = pok ()      
