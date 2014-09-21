@@ -32,3 +32,7 @@ and supply the directory as argument to `pok` for quick-opening.
 * OCaml Text https://github.com/vbmithr/ocaml-text
 
 _OCaml packages can be found on opam._
+
+#### How to compile
+
+Run `ocamlbuild -use-ocamlfind pok.native` from within directory containing `pok.ml`.
