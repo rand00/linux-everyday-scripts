@@ -13,9 +13,10 @@ several pdf's; this version of pok is not compatible with those._
 
 #### Features
 
-* When given directories as part of the arguments, *pok* searches non-recursively for pdf-files
-and passes them on to Okular as if you had supplied the pdf's specifically.
-* When supplied no argument, *pok* acts as though you supplied the current working directory as
+* When given specific pdf-files as part of list of arguments - opens these in Okular.
+* When given directories as part of the arguments, pok searches non-recursively for pdf-files
+within the directories, and adds them to the pdf's-to-be-opened.
+* When supplied no argument, pok acts as though you supplied the current working directory as
 argument.
 * The output of Okular is suppressed, so you can continue working in your current terminal.
 
