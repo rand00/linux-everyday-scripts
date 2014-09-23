@@ -18,6 +18,8 @@
 
 open Batteries
 
+let escape_spaces = Pcre.replace ~pat:" +" ~templ:"\\ "
+
 let ext file = String.(
   let _,ext = (try rsplit ~by:"." file with _ -> ("",""))
   in lowercase ext)
@@ -31,7 +33,8 @@ let open_pdfs = function
     Sys.command 
       (String.concat " " 
          (List.flatten 
-            [[ "okular" ]; pdfs;
+            [[ "okular" ]; 
+             List.map escape_spaces pdfs;
              [ "2>/dev/null 1>/dev/null &" ]]))
     |> ignore (*Okular handles the errors*)
 
