@@ -1,0 +1,30 @@
+#! /bin/bash
+
+BEEPFILE="/usr/share/sounds/gnome/default/alerts/sonar.ogg"
+# < this soundfile is found on standard ubuntu
+SLEEPTIME=20
+
+beep () { paplay $BEEPFILE }
+
+batt () {
+    BATTSTR=$(acpi)
+    BATTNUM=$(echo $BATTSTR | sed 's/.*\, \([0-9]\+\)%.*/\1/')
+    CRITNUM="11"
+    CRITMSG="BATTERIES ARE DYING ON MARS"
+
+    if (( $BATTNUM < $CRITNUM ))
+    then 
+        echo $BATTSTR | grep -q Charging
+        if (( $? != 0 )); 
+        then 
+            beep
+            notify-send -t 3000 --urgency=critical "$CRITMSG  $BATTNUM%"
+            ## < notify-send is a cmd available on ubuntu
+            #echo $CRITMSG | wall
+            ## < if wanting to echo message to terminals instead of gui-notify
+        fi
+    fi
+    echo $BATTSTR
+}
+
+batt
