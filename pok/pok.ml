@@ -41,7 +41,7 @@ let open_pdfs = function
 let find_pdfs dir = 
   Sys.files_of dir //@ (fun file ->
     match ext file = "pdf" with
-      | true  -> Some (dir ^ file)
+      | true  -> Some (dir ^ "/" ^ file)
       | false -> None)
   |> List.of_enum
   |> function
