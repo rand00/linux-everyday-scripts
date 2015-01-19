@@ -10,6 +10,7 @@ left by running `battw`.
 * When using a tiling window-manager, e.g. StumpWM, have a minimal frame in top/bottom of
 screen to watch battery-level. `watch` also outputs the time, so works as a simple
 terminal-based mode-line.
+* Get notified when battery level is critical - both by beep and notification popup on Ubuntu.
 
 ## Dependencies
 
