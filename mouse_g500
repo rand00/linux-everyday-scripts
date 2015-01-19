@@ -1,0 +1,66 @@
+#! /bin/bash
+
+USAGE="\
+Mouse acceleration script usage (for Logitech G500):\n\
+\tArguments should either be\n\
+\t\t* 'accel'/'a' or\n\
+\t\t* 'noaccel'/'n'\n\
+\tYou can change the script to work on other mice by changing the 'getid_g500' function.\n\
+"
+
+check_arg () {
+    if [[ $1 == 'accel' || $1 == 'a' || $1 == "acc" ]]
+    then echo 'accel'
+    elif [[ $1 == 'noaccel' || $1 == 'n' || $1 == 'noacc' ]]
+    then echo 'noaccel'
+    else echo 'usage'
+    fi
+}
+
+getid_g500 () {
+    xinput | grep -iq "Logitech G500"
+    local g500exists=$?
+    if [[ $g500exists -eq 0 ]]
+    then 
+	local g500ids=$(xinput | grep -i 'g500' | 
+	                sed 's/.*id=\([0-9]*\).*/\1/')
+	echo "SOME "$g500ids
+    else
+	echo "NONE"
+    fi
+}
+
+main () {
+    local ARGS=$*
+    local ID=$(getid_g500)
+    local g500name='Logitech G500'
+    local FAILfind="\tNo device visible named \"$g500name\""
+
+    echo $ID | grep -iqm 1 some
+    ID_pre=$?
+    if [[ $ID_pre -eq 0 ]]
+    then
+	ID=$(echo $ID | sed 's/[a-Z]*\([0-9]*\)/\1/')
+    else
+	echo -e $FAILfind
+	exit 1
+    fi
+    
+    local ACTION=$(check_arg $ARGS)
+    if [[ $ACTION == 'accel' ]]
+    then 
+	for n in $ID
+	do xinput set-prop $n 'Device Accel Profile' 0
+	done
+    elif [[ $ACTION == 'noaccel' ]]
+    then
+	for n in $ID
+	do xinput set-prop $n 'Device Accel Profile' -1
+	done
+    else 
+        echo -e $USAGE
+	exit 1
+    fi
+}
+
+main $*
