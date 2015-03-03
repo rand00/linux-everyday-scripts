@@ -19,6 +19,8 @@
 open Batteries
 
 let escape_spaces = Pcre.replace ~pat:" +" ~templ:"\\ "
+let quote_string s = 
+  let q = "\"" in String.concat "" [ q; s; q ]
 
 let ext file = String.(
   let _,ext = (try rsplit ~by:"." file with _ -> ("",""))
@@ -34,7 +36,7 @@ let open_pdfs = function
       (String.concat " " 
          (List.flatten 
             [[ "okular" ]; 
-             List.map escape_spaces pdfs;
+             List.map quote_string pdfs;
              [ "2>/dev/null 1>/dev/null &" ]]))
     |> ignore (*Okular handles the errors*)
 
