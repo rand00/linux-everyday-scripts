@@ -1,3 +1,4 @@
 true: thread
 true: syntax(camlp4o)
-true: package(text,text.pcre,text.pcre-syntax,batteries)
+true: package(text,text.pcre,text.pcre-syntax,batteries,re.str)
+

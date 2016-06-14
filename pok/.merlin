@@ -1,0 +1,37 @@
+
+
+S .
+B _build
+
+
+#vvvvvvvvvvvvvvv-- merlin-genconf.sh generated --vvvvvvvvvvvvv
+PKG batteries
+PKG text
+PKG text.pcre
+PKG text.pcre-syntax
+PKG re.str
+S /home/rand/.opam/4.02.3/build/batteries.2.4.0/_build
+B /home/rand/.opam/4.02.3/build/batteries.2.4.0/_build
+S /home/rand/.opam/4.02.3/build/batteries.2.4.0/_build/build
+B /home/rand/.opam/4.02.3/build/batteries.2.4.0/_build/build
+S /home/rand/.opam/4.02.3/build/batteries.2.4.0/_build/src
+B /home/rand/.opam/4.02.3/build/batteries.2.4.0/_build/src
+S /home/rand/.opam/4.02.3/build/batteries.2.5.2/_build
+B /home/rand/.opam/4.02.3/build/batteries.2.5.2/_build
+S /home/rand/.opam/4.02.3/build/batteries.2.5.2/_build/build
+B /home/rand/.opam/4.02.3/build/batteries.2.5.2/_build/build
+S /home/rand/.opam/4.02.3/build/batteries.2.5.2/_build/src
+B /home/rand/.opam/4.02.3/build/batteries.2.5.2/_build/src
+S /home/rand/.opam/4.02.3/build/text.0.8.0
+B /home/rand/.opam/4.02.3/build/text.0.8.0
+S /home/rand/.opam/4.02.3/build/text.0.8.0/_build
+B /home/rand/.opam/4.02.3/build/text.0.8.0/_build
+S /home/rand/.opam/4.02.3/build/text.0.8.0/_build/src
+B /home/rand/.opam/4.02.3/build/text.0.8.0/_build/src
+S /home/rand/.opam/4.02.3/build/text.0.8.0/_build/syntax
+B /home/rand/.opam/4.02.3/build/text.0.8.0/_build/syntax
+S /home/rand/.opam/4.02.3/build/text.0.8.0/_build/tests
+B /home/rand/.opam/4.02.3/build/text.0.8.0/_build/tests
+S /home/rand/.opam/4.02.3/lib/text
+B /home/rand/.opam/4.02.3/lib/text
+#^^^^^^^^^^^^^^^-- merlin-genconf.sh generated --^^^^^^^^^^^^^
