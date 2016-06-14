@@ -18,7 +18,6 @@
 
 open Batteries
 
-let escape_spaces = Pcre.replace ~pat:" +" ~templ:"\\ "
 let quote_string s = 
   let q = "\"" in String.concat "" [ q; s; q ]
 
@@ -29,16 +28,59 @@ let ext file = String.(
 let is_existingdir dir = Sys.(
   file_exists dir && is_directory dir)
 
-let open_pdfs = function
+let print_msg ss =
+  let sss = List.map Re_str.(split (regexp "[\r\n\t ]")) ss in
+  let open Format in
+  print_string "Pok: ";
+  open_box 0;
+  List.iter (fun ss' ->
+      List.iter (fun s' ->
+          print_string s';
+          print_space ();
+        ) ss';
+      force_newline ();
+    ) sss;
+  close_box ()
+    
+
+let rec open_pdfs ?(first_run=true) = function
   | [] -> ()
   | pdfs -> 
-    Sys.command 
+    Unix.run_and_read
       (String.concat " " 
          (List.flatten 
             [[ "okular" ]; 
              List.map quote_string pdfs;
-             [ "2>/dev/null 1>/dev/null &" ]]))
-    |> ignore (*Okular handles the errors*)
+             [ "2>/dev/null &" ]]))
+    |> function
+    | Unix.WEXITED 0, _ -> ()
+    | _, str ->
+      Re_str.(split (regexp "\n") str)
+      |> List.exists (fun line ->
+          Re_str.(string_match (regexp ".*export \\$(dbus-launch).*") line 0)
+        )
+      |> function
+      | false ->
+        print_msg [
+          "Pok: Ocular terminated unsuccesfully, and we were not able to fix \
+           the error. The message from Ocular was:";
+          "--------------------------------------------------------";
+          str
+        ]
+      | true ->
+        begin
+          if first_run then begin
+            print_msg [
+              "Pok: Ocular terminated unsuccesfully but we will try to correct the \
+               environment with 'export $(dbus-launch)'..."
+            ];
+            Sys.command "export $(dbus-launch)" |> ignore;
+            open_pdfs ~first_run:false pdfs
+          end
+          else
+            print_msg [ "Pok: No luck this time either - Ocular didn't run on \
+                         second try."]
+        end
 
 let find_pdfs dir = 
   Sys.files_of dir //@ (fun file ->
@@ -70,6 +112,7 @@ let pok () =
           | false -> [ arg ]
           | true  -> find_pdfs arg
        ) (args () |> List.of_enum ))))
+  (*< goto write with pipes*)
   | None -> 
     open_pdfs (find_pdfs (Sys.getcwd ()))
     
