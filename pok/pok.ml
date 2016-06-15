@@ -102,7 +102,7 @@ let find_pdfs dir =
 
 let pok () = 
   match peek (args ()) with 
-  | Some (<:re< "-"* "help">>) -> 
+  | Some arg when Re_str.(string_match (regexp "-+h\\(elp\\)?") arg 0) -> 
     print_msg [
       "Usage: Supply a mixed list of pdf-files or directories \
        containing pdf-files as arguments. Pok will open them all in \
