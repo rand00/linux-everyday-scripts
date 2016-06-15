@@ -42,7 +42,13 @@ let print_msg ss =
     ) sss;
   close_box ()
 
-(*goto make these unique pr. instantiation*)
+(*
+let sleep_millis i =
+  let diff = (Float.of_int i) /. 1000. 
+  and start = Unix.gettimeofday () in
+  while start +. diff < Unix.gettimeofday () do
+*)
+   
 let tmp_okular_resp_file = ref "/tmp/pok_oku_resp"
 let tmp_okular_done = ref "/tmp/pok_oku_done"
 let tmp_tail = ref ""
@@ -76,8 +82,10 @@ let rec open_pdfs ?(first_run=true) = function
               [") &" ]
             ])));
     let times = ref 0 in
-    while not (Sys.file_exists !tmp_okular_done || !times > 2) do
-      (*goto - have finer timing-window; some kind of millis for finetuning*)
+    while not (Sys.file_exists !tmp_okular_done || !times > 1) do
+      (*goto - have finer timing-window; some kind of millis for finetuning - c binding?
+        > nanoseconds : http://stackoverflow.com/questions/1157209/is-there-an-alternative-sleep-function-in-c-to-milliseconds
+      *)
       incr times;
       Unix.sleep 1;
     done;
