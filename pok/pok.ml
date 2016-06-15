@@ -67,9 +67,14 @@ let rec open_pdfs ?(first_run=true) = function
         at_exit
           (fun () ->
              List.iter (fun f ->
-                 if Sys.file_exists f then ignore @@ Sys.command ("rm "^f)
+                 if Sys.file_exists f then
+                   ignore @@ Sys.command ("rm "^f)
                ) [ !tmp_okular_done; !tmp_okular_resp_file; ]
-          )
+          ) (*gomaybe: In general on linux, the /tmp/ dir will be cleaned 
+              up regularly, and pok will not be run too much to flood 
+              the dir because okular is writing to tmp-file while running 
+              (and pok exits before okular does). Solution could be to 
+              let pok run in bg together with okular? *)
       end;
     ignore @@
     (Sys.command
@@ -83,13 +88,16 @@ let rec open_pdfs ?(first_run=true) = function
             ])));
     let times = ref 0 in
     while not (Sys.file_exists !tmp_okular_done || !times > 1) do
-      (*goto - have finer timing-window; some kind of millis for finetuning - c binding?
+      (*goto - have finer timing-window; some kind of millis for 
+        finetuning - c binding?
         > nanoseconds : http://stackoverflow.com/questions/1157209/is-there-an-alternative-sleep-function-in-c-to-milliseconds
       *)
       incr times;
       Unix.sleep 1;
     done;
-    if Sys.(file_exists !tmp_okular_done && file_exists !tmp_okular_resp_file) then
+    if Sys.(file_exists !tmp_okular_done &&
+            file_exists !tmp_okular_resp_file)
+    then
       let okular_resp_str = IO.read_all (open_in !tmp_okular_resp_file) in
       let okular_resp_contains_fix = 
         Re_str.(split (regexp "\n") okular_resp_str)
