@@ -54,33 +54,35 @@ let rec open_pdfs ?(first_run=true) = function
              [ "2>/dev/null &" ]]))
     |> function
     | Unix.WEXITED 0, _ -> ()
-    | _, str ->
-      Re_str.(split (regexp "\n") str)
-      |> List.exists (fun line ->
-          Re_str.(string_match (regexp ".*export \\$(dbus-launch).*") line 0)
-        )
-      |> function
-      | false ->
-        print_msg [
-          "Pok: Ocular terminated unsuccesfully, and we were not able to fix \
-           the error. The message from Ocular was:";
-          "--------------------------------------------------------";
-          str
-        ]
-      | true ->
+    | _, err_str ->
+      let okular_resp_contains_fix = 
+        Re_str.(split (regexp "\n") err_str)
+        |> List.exists (fun line ->
+            Re_str.(string_match (regexp ".*export \\$(dbus-launch).*") line 0)
+          )
+      in
+      if okular_resp_contains_fix then 
         begin
           if first_run then begin
             print_msg [
-              "Pok: Ocular terminated unsuccesfully but we will try to correct the \
+              "Pok: Okular terminated unsuccesfully but we will try to correct the \
                environment with 'export $(dbus-launch)'..."
             ];
-            Sys.command "export $(dbus-launch)" |> ignore;
+            ignore @@ Sys.command "export $(dbus-launch)";
             open_pdfs ~first_run:false pdfs
-          end
-          else
-            print_msg [ "Pok: No luck this time either - Ocular didn't run on \
-                         second try."]
+          end else
+            print_msg [
+              "Pok: No luck this time either - Okular didn't run on second try."
+            ]
         end
+      else
+        print_msg [
+          "Pok: Okular terminated unsuccesfully, and we were not able to fix \
+           the error. The message from Okular was:";
+          "--------------------------------------------------------";
+          err_str
+        ]
+
 
 let find_pdfs dir = 
   Sys.files_of dir //@ (fun file ->
@@ -90,29 +92,33 @@ let find_pdfs dir =
   |> List.of_enum
   |> function
       | [] -> 
-        let _ = print_endline 
-          (String.concat "" 
-             [ "No pdf's where present in the supplied directory, '";
-               dir; "'." ]) 
-        in [] 
+        print_msg [
+          Printf.sprintf
+            "No pdf's where present in the supplied directory, '%s'."
+            dir
+        ]; 
+        [] 
       | l -> l
 
 let pok () = 
   match peek (args ()) with 
   | Some (<:re< "-"* "help">>) -> 
-    print_endline 
-      (String.concat ""
-         [ "Pok usage // Supply a mixed list of pdf-files or directories ";
-           "containing pdf-files as arguments. Pok will open them all in ";
-           "the Okular pdf-viewer." ])
-  | Some _ -> 
+    print_msg [
+      "Usage: Supply a mixed list of pdf-files or directories \
+       containing pdf-files as arguments. Pok will open them all in \
+       the Okular pdf-viewer."
+    ]
+  | Some _ ->
+    let args = args () |> List.of_enum in
     open_pdfs
-      (List.( flatten ( map (fun arg -> 
-        match is_existingdir arg with
-          | false -> [ arg ]
-          | true  -> find_pdfs arg
-       ) (args () |> List.of_enum ))))
-  (*< goto write with pipes*)
+      (List.
+         (flatten
+            (map
+               (fun arg -> 
+                  match is_existingdir arg with
+                  | true  -> find_pdfs arg
+                  | false -> [ arg ]
+               ) args )))
   | None -> 
     open_pdfs (find_pdfs (Sys.getcwd ()))
     
