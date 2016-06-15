@@ -41,22 +41,50 @@ let print_msg ss =
       force_newline ();
     ) sss;
   close_box ()
-    
+
+(*goto make these unique pr. instantiation*)
+let tmp_okular_resp_file = ref "/tmp/pok_oku_resp"
+let tmp_okular_done = ref "/tmp/pok_oku_done"
+let tmp_tail = ref ""
 
 let rec open_pdfs ?(first_run=true) = function
   | [] -> ()
-  | pdfs -> 
-    Unix.run_and_read
-      (String.concat " " 
-         (List.flatten 
-            [[ "okular" ]; 
-             List.map quote_string pdfs;
-             [ "2>/dev/null &" ]]))
-    |> function
-    | Unix.WEXITED 0, _ -> ()
-    | _, err_str ->
+  | (pdf1::_) as pdfs ->
+    if first_run then
+      begin      
+        tmp_tail :=
+          (Digest.string
+             ((Float.to_string @@ Unix.gettimeofday ()) ^ pdf1)
+           |> Digest.to_hex);
+        tmp_okular_resp_file := !tmp_okular_resp_file ^ !tmp_tail;
+        tmp_okular_done := !tmp_okular_done ^ !tmp_tail;
+        at_exit
+          (fun () ->
+             List.iter (fun f ->
+                 if Sys.file_exists f then ignore @@ Sys.command ("rm "^f)
+               ) [ !tmp_okular_done; !tmp_okular_resp_file; ]
+          )
+      end;
+    ignore @@
+    (Sys.command
+       (String.concat " " 
+          (List.flatten [
+              [ "(okular" ]; 
+              List.map quote_string pdfs;
+              [ "1>&2 2>"^ !tmp_okular_resp_file];
+              ["; touch "^ !tmp_okular_done];
+              [") &" ]
+            ])));
+    let times = ref 0 in
+    while not (Sys.file_exists !tmp_okular_done || !times > 2) do
+      (*goto - have finer timing-window; some kind of millis for finetuning*)
+      incr times;
+      Unix.sleep 1;
+    done;
+    if Sys.(file_exists !tmp_okular_done && file_exists !tmp_okular_resp_file) then
+      let okular_resp_str = IO.read_all (open_in !tmp_okular_resp_file) in
       let okular_resp_contains_fix = 
-        Re_str.(split (regexp "\n") err_str)
+        Re_str.(split (regexp "\n") okular_resp_str)
         |> List.exists (fun line ->
             Re_str.(string_match (regexp ".*export \\$(dbus-launch).*") line 0)
           )
@@ -80,8 +108,9 @@ let rec open_pdfs ?(first_run=true) = function
           "Pok: Okular terminated unsuccesfully, and we were not able to fix \
            the error. The message from Okular was:";
           "--------------------------------------------------------";
-          err_str
+          okular_resp_str
         ]
+    else exit 0 (*We think Okular is running succesfully*)
 
 
 let find_pdfs dir = 
