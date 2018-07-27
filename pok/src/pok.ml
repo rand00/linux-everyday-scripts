@@ -29,7 +29,7 @@ let is_existingdir dir = Sys.(
   file_exists dir && is_directory dir)
 
 let print_msg ss =
-  let sss = List.map Re_str.(split (regexp "[\r\n\t ]")) ss in
+  let sss = List.map Re.Str.(split (regexp "[\r\n\t ]")) ss in
   let open Format in
   print_string "Pok: ";
   open_box 0;
@@ -100,9 +100,9 @@ let rec open_pdfs ?(first_run=true) = function
     then
       let okular_resp_str = IO.read_all (open_in !tmp_okular_resp_file) in
       let okular_resp_contains_fix = 
-        Re_str.(split (regexp "\n") okular_resp_str)
+        Re.Str.(split (regexp "\n") okular_resp_str)
         |> List.exists (fun line ->
-            Re_str.(string_match (regexp ".*export \\$(dbus-launch).*") line 0)
+            Re.Str.(string_match (regexp ".*export \\$(dbus-launch).*") line 0)
           )
       in
       if okular_resp_contains_fix then 
@@ -147,7 +147,7 @@ let find_pdfs dir =
 
 let pok () = 
   match peek (args ()) with 
-  | Some arg when Re_str.(string_match (regexp "-+h\\(elp\\)?") arg 0) -> 
+  | Some arg when Re.Str.(string_match (regexp "-+h\\(elp\\)?") arg 0) -> 
     print_msg [
       "Usage: Supply a mixed list of pdf-files or directories \
        containing pdf-files as arguments. Pok will open them all in \
