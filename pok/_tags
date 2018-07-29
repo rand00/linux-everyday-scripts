@@ -1,3 +1,4 @@
 true: thread
-true: package(batteries,re.str)
+true: package(batteries,re.str,rresult,bos,containers)
+<src/**>: include
 

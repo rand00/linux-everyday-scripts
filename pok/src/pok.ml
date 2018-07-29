@@ -48,7 +48,29 @@ let sleep_millis i =
   and start = Unix.gettimeofday () in
   while start +. diff < Unix.gettimeofday () do
 *)
-   
+
+let export_dbus_launch () =
+  let open Rresult in
+  let open Bos in
+  OS.Cmd.(
+    Cmd.(v "dbus-launch")
+    |> run_out
+    |> to_string 
+  )
+  >>| String.split_on_char '\n'
+  >>= (fun lines -> 
+    let bindings = List.map (fun line ->
+      let segs = String.split_on_char '=' line in
+      let key = List.hd segs
+      and value = List.tl segs |> String.concat "=" in
+      key, value
+    ) lines
+    in
+    CCResult.map_l (fun (key, value) ->
+      OS.Env.set_var key @@ Some value
+    ) bindings
+  ) 
+
 let tmp_okular_resp_file = ref "/tmp/pok_oku_resp"
 let tmp_okular_done = ref "/tmp/pok_oku_done"
 let tmp_tail = ref ""
@@ -102,8 +124,8 @@ let rec open_pdfs ?(first_run=true) = function
       let okular_resp_contains_fix = 
         Re.Str.(split (regexp "\n") okular_resp_str)
         |> List.exists (fun line ->
-            Re.Str.(string_match (regexp ".*export \\$(dbus-launch).*") line 0)
-          )
+          Re.Str.(string_match (regexp ".*export \\$(dbus-launch).*") line 0)
+        )
       in
       if okular_resp_contains_fix then 
         begin
@@ -112,20 +134,25 @@ let rec open_pdfs ?(first_run=true) = function
               "Pok: Okular terminated unsuccesfully but we will try to correct the \
                environment with 'export $(dbus-launch)'..."
             ];
-            ignore @@ Sys.command "export $(dbus-launch)";
-            open_pdfs ~first_run:false pdfs
+            match export_dbus_launch () with
+            | Ok _ -> open_pdfs ~first_run:false pdfs
+            | Error _ -> print_msg [
+              "Pok: Couldn't export `dbus-launch` environment variables."
+            ]
+
           end else
             print_msg [
               "Pok: No luck this time either - Okular didn't run on second try."
             ]
         end
       else
-        print_msg [
-          "Pok: Okular terminated unsuccesfully, and we were not able to fix \
-           the error. The message from Okular was:";
-          "--------------------------------------------------------";
-          okular_resp_str
-        ]
+        (* print_msg [
+         *   "Pok: Okular terminated unsuccesfully, and we were not able to fix \
+         *    the error. The message from Okular was:";
+         *   "--------------------------------------------------------";
+         *   okular_resp_str
+         * ] *)
+        ()
     else exit 0 (*We think Okular is running succesfully*)
 
 
